@@ -1,0 +1,1 @@
+mv test/* /home/jiaxusu2/

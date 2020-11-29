@@ -1,0 +1,119 @@
+put test1.txt test_sdfs.txt
+
+put test2.txt test2_sdfs.txt
+
+
+put test1.txt test_sdfs3.txt
+
+get test_sdfs.txt test_from_sdfs.txt
+
+get test_sdfs2.txt test_from_sdfs.txt
+
+get test2_sdfs.txt test_from_sdfs.txt
+
+get test2_sdfs.txt test2_from_sdfs.txt
+
+get hhhhh.txt test2_from_sdfs.txt
+
+cd /home/jiaxusu2/sdfs_dir/
+
+cd /home/jiaxusu2/425MP2
+
+
+
+rm -rfv /home/jiaxusu2/sdfs_dir/*
+
+dd if=/dev/urandom of=test1 bs=1 count=2097152
+
+
+dd if=/dev/urandom of=test2 bs=1 count=2097152
+
+dd if=/dev/urandom of=test3 bs=1 count=2097152
+
+dd if=/dev/urandom of=test4 bs=1 count=2097152
+
+dd if=/dev/urandom of=test5 bs=1 count=2097152
+
+dd if=/dev/urandom of=test6 bs=1 count=2097152
+
+dd if=/dev/urandom of=test7 bs=1 count=2097152
+
+dd if=/dev/urandom of=test8 bs=1 count=2097152
+
+dd if=/dev/urandom of=test9 bs=1 count=2097152
+
+dd if=/dev/urandom of=test10 bs=1 count=2097152
+
+
+dd if=/dev/urandom of=/home/jiaxusu2/test bs=1 count=530000000
+
+dd if=/dev/urandom of=large_file bs=1 count=530000000
+
+
+put test1.txt test1_sdfs.txt
+
+put test1 test1_sdfs.txt
+
+put test2 test2_sdfs.txt
+
+put test3 test3_sdfs.txt
+
+put test4 test4_sdfs.txt
+
+put test5 test5_sdfs.txt
+
+put test6 test6_sdfs.txt
+
+put test7 test7_sdfs.txt
+
+put test8 test8_sdfs.txt
+
+put test9 test9_sdfs.txt
+
+put test10 test10_sdfs.txt
+
+get test4_sdfs.txt test4_from_sdfs.txt
+
+
+get test3_sdfs.txt test3_from_sdfs.txt
+
+ls test2_sdfs.txt
+
+ls test3_sdfs.txt
+
+ls test4_sdfs.txt
+
+ls test5_sdfs.txt
+
+cd ..
+fallocate -l 500M 500M.txt
+cd 425MP2
+
+
+#Test g 
+put 500M.txt 500M_sdfs.txt
+
+get 500M_sdfs.txt 500M_from_sdfs.txt
+
+fallocate -l 100M 100M.txt
+
+
+  ssh jiaxusu2@fa20-cs425-g21-01.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-02.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-03.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-04.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-05.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-06.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-07.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-08.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-09.cs.illinois.edu  
+
+  ssh jiaxusu2@fa20-cs425-g21-10.cs.illinois.edu  

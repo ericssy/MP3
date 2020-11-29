@@ -1,0 +1,19 @@
+maple <maple_exe> <num_maples>
+<sdfs_intermediate_filename_prefix> <sdfs_src_directory>
+
+maple word_cnt_maple.py 3 word_cnt_intermediate word_cnt_file 
+juice word_cnt_juice.py 3 word_cnt_intermediate_output word_cnt_juice_output 1
+
+maple word_cnt_maple.py 4 word_cnt_intermediate word_cnt_file 
+juice word_cnt_juice.py 4 word_cnt_intermediate_output word_cnt_juice_output 1
+
+put word_cnt_file1.txt word_cnt_file1.txt
+put word_cnt_file2.txt word_cnt_file2.txt
+put word_cnt_file3.txt word_cnt_file3.txt
+put word_cnt_file4.txt word_cnt_file4.txt
+put word_cnt_file5.txt word_cnt_file5.txt
+put word_cnt_file6.txt word_cnt_file6.txt
+put word_cnt_file7.txt word_cnt_file7.txt
+
+put_prefix word_cnt_file
+

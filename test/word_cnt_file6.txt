@@ -1,0 +1,4 @@
+SpaceBook needs to fight off competition from their two biggest 
+competitors Pied Piper Inc and Hooli Inc They also 
+have to fight the scourge of fake news So theyve decided to 
+build a batch processing system that is faster than Mapreduce Hadoop

@@ -1,0 +1,7 @@
+Below SpaceBook has been very detailed about the design of MapleJuice 
+However they want you to fill in some gaps in the design 
+and of course to implement the system Be prepared to improvise 
+be prepared to deploy new systems and be prepared for the unknown 
+Remember
+Move Fast and Break Things
+Or Fail FastOften and Succeed Soon
