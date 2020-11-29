@@ -838,17 +838,19 @@ class Talker(object):
             self.MapleJuice_tracker = {}
             ### Generate message and send it over to worker VMs. Keep the
             ### last one for Master itself.
-            for i in range(num_maples):
-                if (i != num_maples - 1):
-                    target_ip = talkable_members[i].split("_")[0]
+            cnt = 0
+            for key in hash_table:
+                cnt += 1
+                if (cnt != len(hash_table)):
+                    target_ip = talkable_members[key].split("_")[0]
                 msg = {}
                 msg[OP] = "Maple_start"
-                msg[HASHED_KEY] = i
+                msg[HASHED_KEY] = key
                 msg[MAPLE_EXE] = maple_exe
                 msg[SDFS_TMP_FILENAME_PREFIX] = sdfs_tmp_filename_prefix
-                msg[SOURCE_FILES] = hash_table[i]
-                msg["target_ip"] = target_ip
-                if (i != num_maples - 1):
+                msg[SOURCE_FILES] = hash_table[key]
+                if (cnt != len(hash_table)):
+                    msg["target_ip"] = target_ip
                     self.send_message_through_socket_mapleJuice(msg, target_ip)
                     self.MapleJuice_tracker[target_ip] = msg
 
@@ -1108,8 +1110,8 @@ class Talker(object):
                 msg[SDFS_DEST_FILENAME] = sdfs_dest_filename
                 msg[SOURCE_FILES] = hash_table[key]
                 msg[DELETE_INPUT] = delete_input
-                msg["target_ip"] = target_ip
                 if (cnt != len(hash_table)):
+                    msg["target_ip"] = target_ip
                     self.send_message_through_socket_mapleJuice(msg, target_ip)
                     self.MapleJuice_tracker[target_ip] = msg
 
