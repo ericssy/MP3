@@ -15,6 +15,3 @@ for line in lines:
     for word in line:
         if (word.isalpha()):
             print(word, 1)
-
-
-

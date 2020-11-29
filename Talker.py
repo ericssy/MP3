@@ -16,7 +16,7 @@ import time
 from ast import literal_eval
 
 import glob
-import sys 
+import sys
 import os
 
 
@@ -68,10 +68,10 @@ class Talker(object):
         self.MyCurrentOperation = ""
         self.waiting = False
 
-        ## MapleJuice 
+        ## MapleJuice
         self.mapleJuiceQueue = []
         self.MapleJuice_tracker = {}
-        
+
 
     def isThisIpMaster(self):
         if self.master_info[0] == self.ip:
@@ -117,9 +117,9 @@ class Talker(object):
         print("no new worker available")
 
     def grouptalk(self):
-        
+
         while True:
-            # we need this lock to avoid deadlock 
+            # we need this lock to avoid deadlock
             member_list_lock.acquire()
 
             if self.status == 'JOINED' or self.status == TO_QUIT:
@@ -129,7 +129,7 @@ class Talker(object):
                 if len(failedVms) > 0:
                     self.updateSuoleutuBecuaseOfFailure(failedVms)
                     self.updateMapleJuice_tracker(failedVms)
-                
+
                 self.heartbeat_increment()
 
                 if self.master_info[0] == -1:
@@ -279,7 +279,7 @@ class Talker(object):
                 waitingLock.acquire()
                 self.master_queue.append(self.MyCurrentOperation)
                 waitingLock.release()
-        
+
         elif cmd_array[0] == 'put':
             if len(cmd_array) != 3:
                 print("wrong input for put")
@@ -441,7 +441,7 @@ class Talker(object):
                 # we need to update the suoluetu
                 # if it is a new put
                 sdfsFileName = task[SDFS_FILE_NAME]
-                
+
                 # if suoluotu contains sdfsFileName
                 if sdfsFileName not in self.suoLueTu:
                     # we need to find 4 machines to the requester so that he can send files to them
@@ -477,7 +477,7 @@ class Talker(object):
                             t = threading.Thread(target=scpFileTransfer, args=(toHostName, fromFile, toFile, ))
                             threads.append(t)
                             t.start()
-                        
+
                         for t in threads:
                             t.join()
 
@@ -499,7 +499,7 @@ class Talker(object):
                 else:
                     requesterIp = task[REQUEST_IP]
                     ### requesterIp == self.ip == Master IP
-                    ## check if request IP equals to master ip 
+                    ## check if request IP equals to master ip
                     if (requesterIp == self.ip):
                         task[TO_DO] = WRITE
                         task[FILE_TARGET_IP] = self.suoLueTu[sdfsFileName]
@@ -527,7 +527,7 @@ class Talker(object):
                         self.MyCurrentOperation = ""
                         myCurrentOperationLock.release()
                         print("PUT " + localfilename + " to " + sdfsfilename + " completed")
-     
+
                     else:
                         requesterIp = task[REQUEST_IP]
                         task[TO_DO] = WRITE
@@ -754,7 +754,7 @@ class Talker(object):
         # sock.send(json.dumps(message))
         sock.sendto(json.dumps(message), (target_ip, PORT_NUMBER_FILE))
         sock.close
-    
+
     def send_message_through_socket_mapleJuice(self, message, target_ip):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         print("MapleJuice socket send message to  : ", str(target_ip), message)
@@ -776,7 +776,7 @@ class Talker(object):
     #         num_maples = int(cmd_split[2])
     #         sdfs_tmp_filename_prefix = cmd_split[3]
     #         sdfs_src_dir = cmd_split[4]
-            
+
     #     elif (cmd_type == "juice"):
     #         juice_exe = cmd_split[1]
     #         num_juices = int(cmd_split[2])
@@ -792,15 +792,15 @@ class Talker(object):
         num_maples = int(cmd_split[2])
         sdfs_tmp_filename_prefix = cmd_split[3]
         sdfs_src_dir = cmd_split[4]
-        
+
         while (len(self.mapleJuiceQueue) > 0):
             continue
-        
-        
+
+
         self.mapleJuiceQueue.append(cmd_split)
         if self.isThisIpMaster():
             print("Maple Phase starts")
-            
+
             ### get all the source files in sdfs_src_dir directory
             # TODO:
             maple_src_files = []
@@ -809,11 +809,11 @@ class Talker(object):
             print(maple_src_files)
 
             talkable_members = self.membershipList.talkableMembers()
-            # if there's not enough machines 
+            # if there's not enough machines
             if (talkable_members < num_maples - 2):
                 num_maples = talkable_members + 1
-            
-            # Partitioning with Hash 
+
+            # Partitioning with Hash
             hash_table = {}
             for src_file in maple_src_files:
                 hashed_key = int(sys.maxint) & abs(hash(src_file)) % num_maples
@@ -823,21 +823,21 @@ class Talker(object):
                 else:
                     hash_table[hashed_key] = []
                     hash_table[hashed_key].append(src_file)
-            
+
             print("hash_table: ", hash_table)
             # vm_hashedKey_lookup = []
             # vm_hashedKey_lookup[self.ip] = 0
             # for i in range(num_maples):
             #     vm_hashedKey_lookup.append(talkable_members[i])
 
-            #DONE: 
+            #DONE:
             # change num_maples to min(number of files, num_maples)
             num_maples = min(len(maple_src_files), num_maples)
 
             # self.MapleJuice_tracker = hash_table.copy()
             self.MapleJuice_tracker = {}
             ### Generate message and send it over to worker VMs. Keep the
-            ### last one for Master itself. 
+            ### last one for Master itself.
             for i in range(num_maples):
                 if (i != num_maples - 1):
                     target_ip = talkable_members[i].split("_")[0]
@@ -847,42 +847,42 @@ class Talker(object):
                 msg[MAPLE_EXE] = maple_exe
                 msg[SDFS_TMP_FILENAME_PREFIX] = sdfs_tmp_filename_prefix
                 msg[SOURCE_FILES] = hash_table[i]
-                msg["target_ip"] = target_ip 
+                msg["target_ip"] = target_ip
                 if (i != num_maples - 1):
                     self.send_message_through_socket_mapleJuice(msg, target_ip)
                     self.MapleJuice_tracker[target_ip] = msg
-                
 
-            #DONE: 
-            # map_task() for master itself 
+
+            #DONE:
+            # map_task() for master itself
             self.maple_task(msg)
 
             print("--------[Maple !] The initial tasks has been assigned.----- ")
 
             #
             while (len(self.MapleJuice_tracker) > 0):
-                continue 
+                continue
             print("[Maple] Maple tasks from all Worker VM completed")
-            ## all Maple task finsihed 
-            ## Combine all output files from task 
+            ## all Maple task finsihed
+            ## Combine all output files from task
             self.maple_phase_generate_outputs(hash_table, sdfs_tmp_filename_prefix)
             self.mapleJuiceQueue.pop(0)
 
         else:
             # DONE:
-            ## send command to master 
+            ## send command to master
             msg = {}
             msg[OP] = WORKER_VM_SENT_MAPLE_TO_MASTER
             msg[CMD_SPLIT] = cmd_split
             self.send_message_through_socket_mapleJuice(msg, self.master_info[0])
             self.mapleJuiceQueue.pop(0)
-            return 
-        
-
-            
+            return
 
 
-    def mapleJuice_listen(self): 
+
+
+
+    def mapleJuice_listen(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.bind((self.ip, PORT_NUMBER_MAPLEJUICE))
         print("MapleJuice Listen Start")
@@ -894,41 +894,41 @@ class Talker(object):
             except:
                 payload = payload
             print("MapleJuice listener node payload: ", payload)
-            
+
             if (self.isThisIpMaster() == False):
                 if (payload[OP] == "Maple_start"):
                     self.maple_task(payload)
                     #TODO: need to update the num of tasks completed
-                
+
                 if (payload[OP] == "Juice_start"):
                     self.juice_task(payload)
 
             else:
-            # Master 
-                #DONE: 
+            # Master
+                #DONE:
                 # need to update the num of tasks completed
                 if (payload[OP] == MAPLE_TASK_COMPLETE):
                     MapleJuice_trackerLock.acquire()
-                    del self.MapleJuice_tracker[payload["target_ip"]] 
+                    del self.MapleJuice_tracker[payload["target_ip"]]
                     print("----------[MAPLE !]vm ip: " + payload["target_ip"] + "is finished-----")
                     MapleJuice_trackerLock.release()
-                
+
                 if (payload[OP] == JUICE_TASK_COMPLETE):
                     MapleJuice_trackerLock.acquire()
-                    del self.MapleJuice_tracker[payload["target_ip"]] 
+                    del self.MapleJuice_tracker[payload["target_ip"]]
                     MapleJuice_trackerLock.release()
 
                 #DONE: receive command from Worker VM, create new thread
                 if (payload[OP] == WORKER_VM_SENT_MAPLE_TO_MASTER):
                     thread.start_new_thread(self.start_maple_phase, (payload[CMD_SPLIT],))
-                
+
                 #TODO:
                 # receive JUICE task from Worker VM, create new thread
                 if (payload[OP] == WORKER_VM_SENT_JUICE_TO_MASTER):
                     thread.start_new_thread(self.start_juice_phase, (payload[CMD_SPLIT],))
-                
 
-            
+
+
 
 
     def maple_task(self, payload):
@@ -948,11 +948,11 @@ class Talker(object):
             while self.MyCurrentOperation != '':
                 continue
             print("[Maple] Get sdfs file " + source_files_needed[i] + " finished ")
-        
-        # invoke the maple_exe to read the input file 
+
+        # invoke the maple_exe to read the input file
         output_filename = sdfs_tmp_filename_prefix + "_" + str(hashed_key)
         output_file = open(DIRECTORY + output_filename, "w")
-        
+
         # cmd_upper_dir = "cd .."
         # os.system(cmd_upper_dir)
         # invoke the maple_exe to read the input file
@@ -967,24 +967,24 @@ class Talker(object):
         if (not self.isThisIpMaster()):
             # send file through scp
             scpFileTransfer(self.master_info[0], DIRECTORY + output_filename, DIRECTORY + output_filename)
-            # TODO: delete intermediate file after scp transfer 
-            # send message back to Master 
+            # TODO: delete intermediate file after scp transfer
+            # send message back to Master
             payload[OP] = MAPLE_TASK_COMPLETE
             self.send_message_through_socket_mapleJuice(payload, self.master_info[0])
         else:
-            # Master 
+            # Master
             # MapleJuice_trackerLock.acquire()
             # del self.MapleJuice_tracker[payload[HASHED_KEY]]
             # MapleJuice_trackerLock.release()
-            return 
+            return
 
     def maple_phase_generate_outputs(self, hash_table, sdfs_tmp_filename_prefix):
         '''
-        hashed_key :  list of pairs 
+        hashed_key :  list of pairs
         0  :  [(hello, 1), (World, 1), (hello, 1)]
-        
 
-        word 
+
+        word
         '''
         dict_ = {}
         files = []
@@ -1002,7 +1002,7 @@ class Talker(object):
                     dict_[key].append(str(value))
                 else:
                     dict_[key] = [str(value)]
-        
+
         vm_to_keys_map = {}
         for key in dict_:
             hashed_key = int(sys.maxint) & abs(hash(key)) % 10
@@ -1013,20 +1013,20 @@ class Talker(object):
                 vm_to_keys_map[hashed_key].append((key, dict_[key]))
 
 
-        # TODO: Delete intermediate files sent from Worker vm 
+        # TODO: Delete intermediate files sent from Worker vm
         self.delete_file(sdfs_tmp_filename_prefix)
 
         for hashed_key in vm_to_keys_map:
-            filename = sdfs_tmp_filename_prefix + "_" + "output" + "_" + str(hashed_key) 
+            filename = sdfs_tmp_filename_prefix + "_" + "output" + "_" + str(hashed_key)
             f = open(DIRECTORY + filename, 'w')
             for pair in vm_to_keys_map[hashed_key]:
                 f.write(str(pair))
                 f.write("\n")
             f.close()
             files.append(filename)
-        
 
-        ## upload the files to SDFS 
+
+        ## upload the files to SDFS
         for file in files:
             cmd_put = "put" + " " + file + " " + file
             myCurrentOperationLock.acquire()
@@ -1042,6 +1042,7 @@ class Talker(object):
     def put_with_prefix(self, cmd_split):
         prefix = cmd_split[1]
         files = glob.glob(DIRECTORY + prefix + "*")
+
         for file in files:
             file = file.split("/")[-1]
             cmd_put = "put" + " " + file + " " + file
@@ -1052,7 +1053,7 @@ class Talker(object):
             while self.MyCurrentOperation != '':
                 continue
         print("Put Prefix Complete")
-        
+
     def start_juice_phase(self, cmd_split):
         juice_exe = cmd_split[1]
         num_juice = int(cmd_split[2])
@@ -1062,10 +1063,10 @@ class Talker(object):
             delete_input = False
         else:
             delete_input = True
-        
+
         while (len(self.mapleJuiceQueue) > 0):
             continue
-        
+
         self.mapleJuiceQueue.append(cmd_split)
 
         if self.isThisIpMaster():
@@ -1079,7 +1080,7 @@ class Talker(object):
             if (talkable_members < num_juice - 2):
                 num_juice = talkable_members + 1
 
-            # Partitioning with Hash 
+            # Partitioning with Hash
             hash_table = {}
             for src_file in juice_src_files:
                 hashed_key = int(sys.maxint) & abs(hash(src_file)) % num_juice
@@ -1089,7 +1090,7 @@ class Talker(object):
                 else:
                     hash_table[hashed_key] = []
                     hash_table[hashed_key].append(src_file)
-            
+
             print("hash_table: ", hash_table)
             num_juice = min(len(juice_src_files), num_juice)
 
@@ -1105,7 +1106,7 @@ class Talker(object):
                 msg[HASHED_KEY] = key
                 msg[JUICE_EXE] = juice_exe
                 msg[SDFS_DEST_FILENAME] = sdfs_dest_filename
-                msg[SOURCE_FILES] = hash_table[key] 
+                msg[SOURCE_FILES] = hash_table[key]
                 msg[DELETE_INPUT] = delete_input
                 msg["target_ip"] = target_ip
                 if (cnt != len(hash_table)):
@@ -1119,36 +1120,36 @@ class Talker(object):
             print("[----Juice----] Msg sent to all worker VMs")
 
             while (len(self.MapleJuice_tracker) > 0):
-                continue 
-            
+                continue
+
             print("[Juice] Juice tasks from all Worker VM completed")
-            ## all Juice task finsihed 
-            ## TODO: 
-            ## Combine all output files from task 
+            ## all Juice task finsihed
+            ## TODO:
+            ## Combine all output files from task
             self.juice_phase_generate_output(hash_table, sdfs_dest_filename)
-            # DONE: Delete intermediate file 
+            # DONE: Delete intermediate file
             if (delete_input == True):
                 # sdfs_tmp_filename_prefix
                 self.delete_file(sdfs_tmp_filename_prefix)
 
             self.mapleJuiceQueue.pop(0)
-        
+
         else:
             # DONE:
-            ## send command to master 
+            ## send command to master
             msg = {}
             msg[OP] = WORKER_VM_SENT_JUICE_TO_MASTER
             msg[CMD_SPLIT] = cmd_split
             self.send_message_through_socket_mapleJuice(msg, self.master_info[0])
             self.mapleJuiceQueue.pop(0)
-            return 
+            return
 
     def delete_file(self, filename_prefix):
         cmd_delete_intermediate = "rm -r " + DIRECTORY + filename_prefix + "*"
         os.system(cmd_delete_intermediate)
         print(cmd_delete_intermediate)
         print("Juice delete intermediate file")
-        
+
 
     def juice_task(self, payload):
         juice_exe = payload[JUICE_EXE]
@@ -1157,7 +1158,7 @@ class Talker(object):
         hashed_key = payload[HASHED_KEY]
         delete_input = payload[DELETE_INPUT]
 
-        # sdfs get 
+        # sdfs get
         for i in range(len(source_files_needed)):
             cmd_get = "get" + " " + source_files_needed[i] + " " + source_files_needed[i]
             # change MyCurrentOperation
@@ -1169,7 +1170,7 @@ class Talker(object):
                 continue
             print("[Juice] Get sdfs file " + source_files_needed[i] + " finished ")
 
-        # invoke the maple_exe to read the input file 
+        # invoke the maple_exe to read the input file
         output_filename = sdfs_dest_filename + "_" + str(hashed_key)
         output_file = open(DIRECTORY + output_filename, "w")
 
@@ -1183,17 +1184,17 @@ class Talker(object):
         if (not self.isThisIpMaster()):
             # send file through scp
             scpFileTransfer(self.master_info[0], DIRECTORY + output_filename, DIRECTORY + output_filename)
-            # TODO: delete intermediate file after scp transfer 
-            # send message back to Master 
+            # TODO: delete intermediate file after scp transfer
+            # send message back to Master
             payload[OP] = JUICE_TASK_COMPLETE
             self.send_message_through_socket_mapleJuice(payload, self.master_info[0])
         else:
-            # Master 
+            # Master
             # MapleJuice_trackerLock.acquire()
             # del self.MapleJuice_tracker[payload[HASHED_KEY]]
             # MapleJuice_trackerLock.release()
             print("Master juice task finished")
-            return 
+            return
 
     def juice_phase_generate_output(self, hash_table, sdfs_dest_filename):
         output_file = DIRECTORY + sdfs_dest_filename
@@ -1203,8 +1204,8 @@ class Talker(object):
             print("execute cmd: ", cmd)
             os.system(cmd)
         file.close()
-        
-        # put file to sdfs 
+
+        # put file to sdfs
         cmd_put = "put" + " " + sdfs_dest_filename + " " + sdfs_dest_filename
         myCurrentOperationLock.acquire()
         self.MyCurrentOperation = "*"
@@ -1259,7 +1260,7 @@ class Talker(object):
 
             elif cmd == 'master':
                 print(self.master_info)
-            
+
             elif (cmd_split[0] == "maple"):
                 if (len(cmd_split) < 5):
                     print("Maple command incorret")

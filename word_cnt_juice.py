@@ -11,7 +11,7 @@ for line in lines:
     l = eval(line)
     key = l[0]
     value = l[1]
-    value_list = [int(i) for i in value] 
+    value_list = [int(i) for i in value]
 
     list_sum = sum(value_list)
     print(key, list_sum)
